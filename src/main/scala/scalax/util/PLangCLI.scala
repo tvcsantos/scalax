@@ -164,7 +164,7 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
     while (true) {
       var pair = readMultipleLinesOpt(start, suffix)
       
-      if (pair._1.trim.matches(quit)) exit(0)
+      if (pair._1.trim.matches(quit)) sys.exit(0)
       
       val res = runProgram(parser, pair._1, extra)
       extra = res._2
@@ -181,7 +181,7 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
     while (true) {
       val name = readLine(start)
       
-      if (name.trim.matches(quit + suffix)) exit(0)
+      if (name.trim.matches(quit + suffix)) sys.exit(0)
       
       val file = new File(name)
       
