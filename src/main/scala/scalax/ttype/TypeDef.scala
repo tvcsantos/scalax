@@ -1,17 +1,15 @@
-package scalax.visitor
+package scalax.ttype
 
 import scala.util.parsing.input.Positional
+import scalax.exception.ScalaException
+import scalax.visitor.{NameNotFound, TypeFreeNames}
 
 case class TypeDef[T <: Type](name:String, t:T) extends Positional {
   override def toString = s"type $name = $t"
 }
 
 object TypeDef {
-  import scalax.util.Visitor
-  import scalax.visitor.Type
-  import scalax.util.Environment
-  import scalax.util.TypeVariable
-  import scalax.util.ScalaException
+  import scalax.util.{Environment, TypeVariable}
   
   def checkTypes[T <: Type](env:Environment[String, TypeDef[T]], l:T*)
   	(implicit ftyn:TypeFreeNames[T]):Unit = {
@@ -33,8 +31,6 @@ object TypeDef {
       checkTypes(env, xs:_*)
     }
   }
-  
-  import scalax.util.Env
    
   def checkType[T <: Type](env:Environment[String, TypeDef[T]], t:T)
   	(implicit ftyn:TypeFreeNames[T]) = checkTypes(env, t)

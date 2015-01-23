@@ -1,7 +1,7 @@
 package scalax.visitor
 
+import scalax.ttype.{TypeDef, Type}
 import scalax.util.Environment
-import scalax.util.Visitor
 import scalax.util.Variable
 
 /*trait GeneralTypeChecker[T, U <: Type, K, L] extends 
