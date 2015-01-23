@@ -7,9 +7,29 @@ import scalax.util.Variable
 /*trait GeneralTypeChecker[T, U <: Type, K, L] extends 
 	Visitor[T, T, (Environment[K], L)]*/
 
+trait TypeExpander[U <: Type]  extends
+  Visitor[U, U, Environment[String, TypeDef[U]]]
+
 trait TypeChecker[T, U <: Type, L] extends 
 	//GeneralTypeChecker[T, U, U, L]
-Visitor[T, T, (Environment[String, U], L)]
+	Visitor[T, T, (Environment[String, U], L)] {
+
+  def getTypeExpander():TypeExpander[U]
+
+  final def expandTypeOpt(t:Option[U],
+    env:Environment[String, TypeDef[U]]):Option[U] = {
+    t match {
+      case None => None
+      case Some(ty) => Some(getTypeExpander() visit(ty, env))
+    }
+  }
+
+  final def expandType(t:U, env:Environment[String, TypeDef[U]]):U = {
+    //TypeDef.checkType[U](env, t)(tyFn)
+    getTypeExpander() visit(t, env)
+  }
+
+}
 
 /*trait ParametricTypeChecker[T, U <: Type, L] extends 
 	GeneralTypeChecker[T, U, Set[U], L]

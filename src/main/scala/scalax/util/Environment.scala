@@ -189,3 +189,140 @@ class Env[T] extends Environment[T] {
     sb.toString
   }
 }*/
+
+object ScopedMap {
+  def apply[K, V]() = new ScopedMap[K, V]()
+}
+
+class ScopedMap[K, V] {
+
+  import scala.collection.mutable.{
+  Map => MutableMap,
+  HashMap => MutableHashMap
+  }
+
+  var assocs:MutableMap[K, V] = MutableHashMap[K, V]()
+  var prev:Option[ScopedMap[K, V]] = None
+
+  protected def this(prev:Option[ScopedMap[K, V]]) = {
+    this()
+    this.prev = prev
+  }
+
+  def put(id:K, t:V):Option[V] =
+    assocs.put(id, t)
+
+  //def put(elem:(K, V)):Option[V] = put(elem._1, elem._2)
+
+  def beginScope():ScopedMap[K, V] =
+    new ScopedMap(Some(this:ScopedMap[K, V]))
+
+  def endScope():Option[ScopedMap[K, V]] = prev
+
+  def get(id:K):Option[V] = {
+    val fthis = assocs get id
+    fthis match {
+      case None =>
+        prev match {
+          case None => None
+          case Some(e) => e get id
+        }
+      case _ => fthis
+    }
+  }
+
+  def getCurrent():Set[(K, V)] = {
+    assocs.toSet[(K, V)]
+  }
+
+  def getCurrentKeys():Set[K] = {
+    assocs.keySet.toSet
+  }
+
+  override def toString() = {
+    import scala.collection.mutable.Stack
+    val stack:Stack[Set[(K, V)]] = Stack()
+    var sentinel:Option[ScopedMap[K, V]] = Some(this)
+    while (sentinel != None) {
+      stack.push(sentinel.get.getCurrent())
+      sentinel = sentinel.get.endScope()
+    }
+    val sb:StringBuilder = StringBuilder.newBuilder
+    var spaces = 0
+    while (!stack.isEmpty) {
+      val assocs = stack.pop
+      sb.append(
+        assocs.map(x => " " * spaces +
+          s"- ${x._1} -> ${x._2}").mkString("\n")
+      )
+      if (assocs isEmpty) sb.append(" " * spaces + "- empty")
+      if (!stack.isEmpty) sb.append("\n")
+      spaces += 2
+    }
+    sb.toString
+  }
+}
+
+object ScopedSet {
+  def apply[K]() = new ScopedSet[K]()
+}
+
+class ScopedSet[K] {
+
+  import scala.collection.mutable.{
+  Set => MutableSet,
+  HashSet => MutableHashSet
+  }
+
+  var assocs:MutableSet[K] = MutableHashSet[K]()
+  var prev:Option[ScopedSet[K]] = None
+
+  protected def this(prev:Option[ScopedSet[K]]) = {
+    this()
+    this.prev = prev
+  }
+
+  def add(id:K):Boolean = assocs.add(id)
+
+  def beginScope():ScopedSet[K] =
+    new ScopedSet(Some(this:ScopedSet[K]))
+
+  def endScope():Option[ScopedSet[K]] = prev
+
+  def contains(id:K):Boolean = {
+    val fthis = assocs contains id
+    if (!fthis) {
+      prev match {
+        case None => false
+        case Some(e) => e contains id
+      }
+    } else true
+  }
+
+  def getCurrent():Set[K] = {
+    assocs.toSet[K]
+  }
+
+  override def toString() = {
+    import scala.collection.mutable.Stack
+    val stack:Stack[Set[K]] = Stack()
+    var sentinel:Option[ScopedSet[K]] = Some(this)
+    while (sentinel != None) {
+      stack.push(sentinel.get.getCurrent())
+      sentinel = sentinel.get.endScope()
+    }
+    val sb:StringBuilder = StringBuilder.newBuilder
+    var spaces = 0
+    while (!stack.isEmpty) {
+      val assocs = stack.pop
+      sb.append(
+        assocs.map(x => " " * spaces +
+          s"- $x").mkString("\n")
+      )
+      if (assocs isEmpty) sb.append(" " * spaces + "- empty")
+      if (!stack.isEmpty) sb.append("\n")
+      spaces += 2
+    }
+    sb.toString
+  }
+}

@@ -243,7 +243,7 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
   }*/
   
   def getErrorFromException(x:Throwable):String = {
-    //x.printStackTrace()
+    x.printStackTrace()
     s"[${printedName}] Error: ${
       if (x.getMessage() == null) x.getStackTraceString
       else x.getMessage()      
