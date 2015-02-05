@@ -1,4 +1,4 @@
-package scalax.visitor
+package scalax.ttype
 
 import scala.util.parsing.input.Positional
 

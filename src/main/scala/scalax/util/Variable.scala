@@ -1,6 +1,7 @@
 package scalax.util
 
 import scala.util.parsing.input.Positional
+import scalax.ttype.Type
 
 trait Variable extends Positional {
   def getName():String
@@ -9,7 +10,5 @@ trait Variable extends Positional {
 trait IndexedVariable extends Variable {
   def getIdx():Int
 }
-
-import scalax.visitor.Type
 
 trait TypeVariable extends Type with Variable

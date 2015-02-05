@@ -1,15 +1,16 @@
-package scalax.util
+package scalax.cli
 
 import org.rogach.scallop.ScallopConf
-import scalax.sys.SystemUtils.FileNameExtensionFilter
+
 import scala.util.parsing.combinator.Parsers
+import scalax.sys.SystemUtils.FileNameExtensionFilter
 
 abstract class PLangCLI[T <: Parsers](override val args: Seq[String], 
     val filter:FileNameExtensionFilter) 
   	extends ScallopConf(args) {
   
   import scalax.sys.SystemUtils
-  
+
   type Parser = T
   type U
   type V
@@ -56,8 +57,9 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
       
   val stdin = opt[Boolean]("stdin", descr = "Read from standard input")
        
-  import scala.collection.mutable.ListBuffer
   import java.io.File
+
+import scala.collection.mutable.ListBuffer
 
   validateOpt(files) {
     case None | Some(Nil) if args.contains("--files") ||
@@ -135,19 +137,16 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
       start:String, quit:String)
   
   def postStart()
-  
-  import scalax.util.Environment
-  import scalax.visitor.TypeDef
-  
+
   protected def startTest(parser:Parser,
       start:String, quit:String)
 
   final protected def startStdin(parser: Parser) {
-    import scalax.sys.SystemUtils.readMultipleLinesOpt
+    import scalax.sys.SystemUtils.readMultipleLines
 
     val suffix = ";;"
 
-    var pair = readMultipleLinesOpt("", suffix)
+    var pair = readMultipleLines("", suffix)
 
     val res = runProgram(parser, pair._1, makeArgumentsForRun())
 
@@ -155,14 +154,14 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
   
   final protected def startInteractive(parser:Parser,
       start:String, quit:String) {
-    import scalax.sys.SystemUtils.readMultipleLinesOpt    
+    import scalax.sys.SystemUtils.readMultipleLines
     
     val suffix = ";;"
          
     var extra = makeArgumentsForRun()
 
     while (true) {
-      var pair = readMultipleLinesOpt(start, suffix)
+      var pair = readMultipleLines(start, suffix)
       
       if (pair._1.trim.matches(quit)) sys.exit(0)
       
@@ -271,8 +270,8 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
             |""".stripMargin
   }
   
-  import java.util.Calendar
   import java.text.SimpleDateFormat
+  import java.util.Calendar
   
   def getVersionModel(versionOpt:Option[String], 
       calendarOpt:Option[Calendar]) = {
@@ -299,7 +298,7 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
         |For option '-f, --files', if <file> is a directory all files with extension 
         |${filter.getPrettyExtensions()} in the directory <file> are executed
     	|
-    	|By default if you don't provide arguments the program will execute in interactvie mode${
+    	|By default if you don't provide arguments the program will execute in interactive mode${
         footerOpt match {case None => "" 
           case Some(footer) => s"\n\n$footer"}}""".stripMargin     
   }

@@ -94,102 +94,6 @@ class Env[K, V] extends Environment[K, V] {
   }
 }
 
-
-/*trait Environment[T] {
-  
-  def assoc(id:String, t:T):Boolean
-    
-  def assoc(elem:(String, T)):Boolean
-  
-  def beginScope():Environment[T]
-  
-  def endScope():Option[Environment[T]]
-  
-  def find(id:String):Option[T]
-  
-  def getCurrent():Set[(String, T)]
-  
-  def getCurrentNames():Set[String]
-}
-
-object Env {
-  def apply[T]() = new Env[T]()
-}
-
-class Env[T] extends Environment[T] {
-  
-  import scala.collection.mutable.{ 
-    Map => MutableMap,
-    HashMap => MutableHashMap
-  }
-  
-  var assocs:MutableMap[String, T] = MutableHashMap[String, T]()
-  var prev:Option[Environment[T]] = None
-  
-  protected def this(prev:Option[Environment[T]]) = {
-    this()
-    this.prev = prev
-  }
-  
-  def assoc(id:String, t:T) = {
-    if (assocs contains(id)) false
-    else {
-      assocs put(id, t)
-      true
-    }
-  }
-    
-  def assoc(elem:(String, T)) = assoc(elem._1, elem._2)
-    
-  def beginScope():Environment[T] = 
-    new Env(Some(this:Environment[T]))
-        
-  def endScope():Option[Environment[T]] = prev
-    
-  def find(id:String):Option[T] = {
-    val fthis = assocs get id
-    fthis match {
-      case None => 
-        prev match {
-          case None => None
-          case Some(e) => e find id
-        }
-      case _ => fthis
-    }
-  }
-  
-  def getCurrent():Set[(String, T)] = {
-    assocs.toSet[(String, T)]
-  }
-  
-  def getCurrentNames():Set[String] = {
-    assocs.keySet.toSet
-  }
-  
-  override def toString() = {
-    import scala.collection.mutable.Stack
-    val stack:Stack[Set[(String, T)]] = Stack()
-    var sentinel:Option[Environment[T]] = Some(this) 
-    while (sentinel != None) {
-      stack.push(sentinel.get.getCurrent())
-      sentinel = sentinel.get.endScope()
-    }
-    val sb:StringBuilder = StringBuilder.newBuilder
-    var spaces = 0
-    while (!stack.isEmpty) {
-      val assocs = stack.pop
-      sb.append(
-          assocs.map(x => " " * spaces + 
-              s"- ${x._1} -> ${x._2}").mkString("\n")
-      )
-      if (assocs isEmpty) sb.append(" " * spaces + "- empty")
-      if (!stack.isEmpty) sb.append("\n")
-      spaces += 2      
-    }
-    sb.toString
-  }
-}*/
-
 object ScopedMap {
   def apply[K, V]() = new ScopedMap[K, V]()
 }
@@ -201,7 +105,7 @@ class ScopedMap[K, V] {
   HashMap => MutableHashMap
   }
 
-  var assocs:MutableMap[K, V] = MutableHashMap[K, V]()
+  val assocs:MutableMap[K, V] = MutableHashMap[K, V]()
   var prev:Option[ScopedMap[K, V]] = None
 
   protected def this(prev:Option[ScopedMap[K, V]]) = {
@@ -211,8 +115,6 @@ class ScopedMap[K, V] {
 
   def put(id:K, t:V):Option[V] =
     assocs.put(id, t)
-
-  //def put(elem:(K, V)):Option[V] = put(elem._1, elem._2)
 
   def beginScope():ScopedMap[K, V] =
     new ScopedMap(Some(this:ScopedMap[K, V]))
@@ -274,7 +176,7 @@ class ScopedSet[K] {
   HashSet => MutableHashSet
   }
 
-  var assocs:MutableSet[K] = MutableHashSet[K]()
+  val assocs:MutableSet[K] = MutableHashSet[K]()
   var prev:Option[ScopedSet[K]] = None
 
   protected def this(prev:Option[ScopedSet[K]]) = {

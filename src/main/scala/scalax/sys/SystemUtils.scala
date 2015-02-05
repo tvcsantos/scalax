@@ -2,44 +2,7 @@ package scalax.sys
 
 object SystemUtils {
 
-  /*def readMultipleLinesFromFile(lines: Iterator[String],
-    suffix: String): (String, String) = {
-    var line = lines.next
-    import scala.collection.mutable.StringBuilder
-    val sb: StringBuilder = StringBuilder.newBuilder
-    var idx = -1
-    while ({ idx = line.indexOf(suffix); idx == -1 }) {
-      sb.append(line + "\n")
-      line = lines.next
-    }
-    val suffixSize = suffix.size
-    sb.append(line.substring(0, idx + suffixSize))
-    return (sb.mkString, line.substring(idx + suffixSize))
-  }*/
-  
-  def readMultipleLinesFromFile(lines: Iterator[String],
-    suffix: String): (String, String) = {
-    //var line = lines.next
-    import scala.collection.mutable.StringBuilder
-    val sb: StringBuilder = StringBuilder.newBuilder
-    var idx = -1
-    var ok = true
-    var rem = ""
-    val suffixSize = suffix.size
-    while (lines.hasNext && ok) {
-      val line = lines.next
-      val idx = line.indexOf(suffix)
-      if (idx == -1) sb.append(line + "\n")
-      else {
-        sb.append(line.substring(0, idx + suffixSize))
-        rem = line.substring(idx + suffixSize)
-        ok = false
-      }
-    }
-    return (sb.mkString, rem)
-  }
-  
-  def readMultipleLinesFromFileOpt(lines: Iterator[String],
+  def readMultipleLinesFromIterator(lines: Iterator[String],
     suffix: String): (String, String) = {
     import scala.collection.mutable.StringBuilder
     val sb: StringBuilder = StringBuilder.newBuilder
@@ -61,21 +24,6 @@ object SystemUtils {
   }
 
   def readMultipleLines(start: String,
-    suffix: String): (String, String) = {
-    var line = readLine(start)
-    import scala.collection.mutable.StringBuilder
-    val sb: StringBuilder = StringBuilder.newBuilder
-    var idx = -1
-    while ({ idx = line.indexOf(suffix); idx == -1 }) {
-      sb.append(line + "\n")
-      line = readLine
-    }
-    val suffixSize = suffix.size
-    sb.append(line.substring(0, idx + suffixSize))
-    return (sb.mkString, line.substring(idx + suffixSize))
-  }
-  
-  def readMultipleLinesOpt(start: String,
     suffix: String): (String, String) = {
     var line = readLine(start)
     import scala.collection.mutable.StringBuilder
@@ -228,9 +176,7 @@ object SystemUtils {
       description:String, extensions:String*) extends FileFilter {
     private val internal = new javax.swing.filechooser.FileNameExtensionFilter(
         description, extensions:_*)
-    
-    //println(extensions)
-    
+
     def accept(file:File):Boolean = {
       if (file != null) {
         if (file.isDirectory()) false

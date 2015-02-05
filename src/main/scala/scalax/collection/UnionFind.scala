@@ -35,7 +35,7 @@
  * 02-Feb-2010 : Initial revision (TC);
  *
  */
-package scalax.util
+package scalax.collection
 
 /**
  * An implementation of <a
@@ -53,10 +53,7 @@ package scalax.util
 class UnionFind[T] {
   //~ Instance fields --------------------------------------------------------
 
-  import scala.collection.mutable.{
-    Map => MutableMap,
-    HashMap => MutableHashMap
-  }
+  import scala.collection.mutable.{HashMap => MutableHashMap, Map => MutableMap}
 
   private val parentMap: MutableMap[T, T] = MutableHashMap()
   private val rankMap: MutableMap[T, Int] = MutableHashMap()
