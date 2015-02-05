@@ -298,7 +298,7 @@ import scala.collection.mutable.ListBuffer
         |For option '-f, --files', if <file> is a directory all files with extension 
         |${filter.getPrettyExtensions()} in the directory <file> are executed
     	|
-    	|By default if you don't provide arguments the program will execute in interactvie mode${
+    	|By default if you don't provide arguments the program will execute in interactive mode${
         footerOpt match {case None => "" 
           case Some(footer) => s"\n\n$footer"}}""".stripMargin     
   }
