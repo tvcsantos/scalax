@@ -36,7 +36,10 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
   def shortVersion(short:String) =
     shortVersionOpt = Some(short)
    
-  val debug = opt[Boolean]("debug", descr = "Debug mode")
+  //val debug = opt[Boolean]("debug", descr = "Debug mode")
+
+  val debug = opt[String]("debug", descr = "Debug mode",
+    argName = "mode", default = Some("NONE"))
 
   //val log = tally()
 
@@ -49,8 +52,8 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
   val output = opt[String]("output",
     descr = "Redirect program output to a file", argName = "file")
 
-  val debugout = opt[String]("debugOutput",
-    descr = "Redirect debug to a file", argName = "file", short = 'c')
+  /*val debugout = opt[String]("debugOutput",
+    descr = "Redirect debug to a file", argName = "file", short = 'c')*/
 
   val fileInteractive = opt[Boolean]("fileInteractive",
     descr = "File interactive mode", short = 'r')
@@ -93,7 +96,7 @@ import scala.collection.mutable.ListBuffer
     case _ => Right(Unit)
   }
 
-  dependsOnAll(debugout, List(debug))
+  //dependsOnAll(debugout, List(debug))
 
   mutuallyExclusive(interactive, fileInteractive, files, stdin)
 
@@ -114,9 +117,10 @@ import scala.collection.mutable.ListBuffer
 
     setDebugger(outWriter)
 
-    if (debug())
-      setLevel(scalax.util.Level.DEBUG)
-    else setLevel(scalax.util.Level.INFO)
+    if (debug.isSupplied) {
+      val level = scalax.util.Level.withName(debug())
+      setLevel(level)
+    } else setLevel(scalax.util.Level.INFO)
       
     Console.withOut(outStream) {
       
