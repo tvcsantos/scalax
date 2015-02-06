@@ -1,62 +1,49 @@
 package scalax.util
 
 trait Debuggable {
-  
-  private var debug = false
-  private var debuggerCounter = 0
-  private var name:String = null
-  private var dir:String = null
-  
-  import java.io.PrintWriter
-  
-  private var debugger:PrintWriter = null
-  
-  def getDebugger():PrintWriter = {
-    if (!isDebug())
-      throw new DebuggerException(
-          "Cannot retrieve debugger: debugger current state is 'off'")
-    initDebugger(dir, name)
+
+  protected var debuggerOpt:Option[DebuggerWriter] = None
+
+  def setDebugger(debuggerWriter: DebuggerWriter) = {
+    debuggerOpt = Some(debuggerWriter)
   }
-  
-  def setDebug(b:Boolean):Unit = debug = b
-  
-  def setName(name:String):Unit =
-    this.name = name
-    
-  def setDir(dir:String):Unit =
-    this.dir = dir
-  
-  def isDebug():Boolean = debug
-  
-  final def clearDebug():Unit = {
-    if (isDebug()) {
-      if (debugger != null) {
-        clearDebugImpl()
-        debuggerCounter += 1
-        debugger.flush
-        debugger.close
-        debugger = null
-      }
-    }
-  }
-    
-  protected def clearDebugImpl():Unit
-  
-  protected def initDebugger(dir:String, name:String):PrintWriter = {
-    if (debugger == null)
-      debugger = 
-          makeDebugger(dir, f"$name${debuggerCounter}%03d_" + 
-    		  Integer.toHexString(System.identityHashCode(this)) + ".debug")
-    debugger
-  } 
-  
-  protected def makeDebugger(dir:String, name:String) = {
-    if (dir == null || name == null)
-      throw new NullPointerException
-    new java.io.PrintWriter(new java.io.File(
-        s"$dir${java.io.File.separator}$name"), "UTF-8")
-  }
+
+  import scalax.util.Level._
+
+  def print(s:String, level:Level):Unit =
+    debuggerOpt.foreach(_.print(s, level))
+
+  def println(s:String, level:Level):Unit =
+    debuggerOpt.foreach(_.println(s, level))
+
+  def print(x:AnyRef, level:Level):Unit =
+    debuggerOpt.foreach(_.print(x, level))
+
+  def println(x:AnyRef, level:Level):Unit =
+    debuggerOpt.foreach(_.println(x, level))
+
+  def print(b:Boolean, level:Level):Unit =
+    debuggerOpt.foreach(_.print(b, level))
+
+  def println(b:Boolean, level:Level):Unit =
+    debuggerOpt.foreach(_.println(b, level))
+
+  def println(level:Level):Unit =
+    debuggerOpt.foreach(_.println(level))
+
+  def setLevel(level:Level):Unit =
+    debuggerOpt.foreach(_.setLevel(level))
+
+  def print(s:String):Unit = print(s, NONE)
+
+  def println(s:String):Unit = println(s, NONE)
+
+  def print(x:AnyRef):Unit = print(x, NONE)
+
+  def println(x:AnyRef):Unit = println(x, NONE)
+
+  def print(b:Boolean):Unit = print(b, NONE)
+
+  def println(b:Boolean):Unit = println(b, NONE)
 
 }
-
-class DebuggerException(msg:String) extends Exception(msg)

@@ -1,15 +1,19 @@
 package scalax.cli
 
+import java.io.{FilterWriter, FileOutputStream}
+
 import org.rogach.scallop.ScallopConf
 
 import scala.util.parsing.combinator.Parsers
 import scalax.sys.SystemUtils.FileNameExtensionFilter
+import scalax.util.{DebuggerWriter, Debuggable}
 
 abstract class PLangCLI[T <: Parsers](override val args: Seq[String], 
     val filter:FileNameExtensionFilter) 
-  	extends ScallopConf(args) {
+  	extends ScallopConf(args) with Debuggable {
   
   import scalax.sys.SystemUtils
+  import scalax.util.Level._
 
   type Parser = T
   type U
@@ -34,6 +38,8 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
    
   val debug = opt[Boolean]("debug", descr = "Debug mode")
 
+  //val log = tally()
+
   val interactive = opt[Boolean]("interactive",
     descr = "Interactive mode")
 
@@ -56,7 +62,7 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
       descr = "Version number")
       
   val stdin = opt[Boolean]("stdin", descr = "Read from standard input")
-       
+
   import java.io.File
 
 import scala.collection.mutable.ListBuffer
@@ -98,11 +104,21 @@ import scala.collection.mutable.ListBuffer
   final def start(parser: Parser) {
     val start = "> "
     val quit = "quit(\\s|\r\n?|\n)*"
+
+    val outStream = if (output.isSupplied)
+        new FileOutputStream(output())
+        else Console.out
+
+    val outWriter =
+      new DebuggerWriter(outStream)
+
+    setDebugger(outWriter)
+
+    if (debug())
+      setLevel(scalax.util.Level.DEBUG)
+    else setLevel(scalax.util.Level.INFO)
       
-    Console.withOut(
-        if (output.isSupplied) new java.io.FileOutputStream(output())
-    	else Console.out
-    ) {
+    Console.withOut(outStream) {
       
 	    if (shortVersion()) {
 	      println(shortVersionOpt.getOrElse("unknown"))
@@ -146,7 +162,7 @@ import scala.collection.mutable.ListBuffer
 
     val suffix = ";;"
 
-    var pair = readMultipleLines("", suffix)
+    val pair = readMultipleLines("", suffix)
 
     val res = runProgram(parser, pair._1, makeArgumentsForRun())
 
@@ -161,7 +177,7 @@ import scala.collection.mutable.ListBuffer
     var extra = makeArgumentsForRun()
 
     while (true) {
-      var pair = readMultipleLines(start, suffix)
+      val pair = readMultipleLines(start, suffix)
       
       if (pair._1.trim.matches(quit)) sys.exit(0)
       
@@ -186,14 +202,14 @@ import scala.collection.mutable.ListBuffer
       
       if (!file.exists()) {
         println(getErrorFromString(
-            file.getPath() + " (No such file or directory)"))
+            file.getPath() + " (No such file or directory)"), ERROR)
       } else {
         if (file.isFile()) {
           if (filter.accept(file))
             startFile(parser, file)
-          else println(getErrorFromString(file.getPath() + 
+          else println(getErrorFromString(file.getPath() +
               s" (Wrong file extension. Expected ${
-            filter.getPrettyExtensions()})"))
+            filter.getPrettyExtensions()})"), ERROR)
         } else {
           val files = listFiles(file, filter, true)
           if (!files.isEmpty) startFiles(parser, files)        	  
@@ -215,7 +231,7 @@ import scala.collection.mutable.ListBuffer
   }
   
   final protected def startFile(parser:Parser, file:File) {    
-    println(s"Processing file $file")
+    println(s"Processing file $file", INFO)
     lazy val testFileLines =
       scala.io.Source.fromFile(file).getLines
       
@@ -223,9 +239,9 @@ import scala.collection.mutable.ListBuffer
     
     val r = SystemUtils.crono(
         runProgram(parser, testFileLines.mkString("\n"), extra))
-    println(s"Test completed in ${r._2 / 1000.0}s")
+    println(s"Test completed in ${r._2 / 1000.0}s", INFO)
 
-    println(s"Finished file $file")
+    println(s"Finished file $file", INFO)
   }
   
   protected def runProgram(parser:Parser,
@@ -242,7 +258,7 @@ import scala.collection.mutable.ListBuffer
   }*/
   
   def getErrorFromException(x:Throwable):String = {
-    x.printStackTrace()
+    //x.printStackTrace()
     s"[${printedName}] Error: ${
       if (x.getMessage() == null) x.getStackTraceString
       else x.getMessage()      
