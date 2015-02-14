@@ -262,7 +262,7 @@ import scala.collection.mutable.ListBuffer
   }*/
   
   def getErrorFromException(x:Throwable):String = {
-    x.printStackTrace()
+    //x.printStackTrace()
     s"[${printedName}] Error: ${
       if (x.getMessage() == null) x.getStackTraceString
       else x.getMessage()      
