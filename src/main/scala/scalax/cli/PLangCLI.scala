@@ -112,10 +112,7 @@ import scala.collection.mutable.ListBuffer
         new FileOutputStream(output())
         else Console.out
 
-    val outWriter =
-      new DebuggerWriter(outStream)
-
-    setDebugger(outWriter)
+    setDebugger(outStream)
 
     if (debug.isSupplied) {
       val level = scalax.util.Level.withName(debug())

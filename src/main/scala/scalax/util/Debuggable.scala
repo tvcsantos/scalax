@@ -1,49 +1,47 @@
 package scalax.util
 
+import java.io.OutputStream
+
 trait Debuggable {
 
-  protected var debuggerOpt:Option[DebuggerWriter] = None
+  import java.io.PrintWriter
 
-  def setDebugger(debuggerWriter: DebuggerWriter) = {
-    debuggerOpt = Some(debuggerWriter)
+  protected var debuggerOpt:Option[PrintWriter] = None
+
+  final def setDebugger(debuggerOut: OutputStream):Unit = {
+    setDebugger(new PrintWriter(debuggerOut, true))
+  }
+
+  def setDebugger(debuggerOut: PrintWriter):Unit = {
+    debuggerOpt = Some(debuggerOut)
   }
 
   import scalax.util.Level._
 
-  def print(s:String, level:Level):Unit =
-    debuggerOpt.foreach(_.print(s, level))
+  final def print[T](s:T):Unit = print(s, NONE)
 
-  def println(s:String, level:Level):Unit =
-    debuggerOpt.foreach(_.println(s, level))
+  final def println[T](s:T):Unit = println(s, NONE)
 
-  def print(x:AnyRef, level:Level):Unit =
-    debuggerOpt.foreach(_.print(x, level))
+  private var currentLevel = NONE
 
-  def println(x:AnyRef, level:Level):Unit =
-    debuggerOpt.foreach(_.println(x, level))
+  final def print[T](s:T, level:Level):Unit = {
+    if (level <= currentLevel)
+      debuggerOpt.foreach(_.print(s))
+  }
 
-  def print(b:Boolean, level:Level):Unit =
-    debuggerOpt.foreach(_.print(b, level))
+  final def println[T](s:T, level:Level):Unit = {
+    print(s, level)
+    println(level)
+  }
 
-  def println(b:Boolean, level:Level):Unit =
-    debuggerOpt.foreach(_.println(b, level))
+  final def println(level: Level):Unit = {
+    if (level <= currentLevel) debuggerOpt.foreach(_.println)
+  }
 
-  def println(level:Level):Unit =
-    debuggerOpt.foreach(_.println(level))
-
-  def setLevel(level:Level):Unit =
-    debuggerOpt.foreach(_.setLevel(level))
-
-  def print(s:String):Unit = print(s, NONE)
-
-  def println(s:String):Unit = println(s, NONE)
-
-  def print(x:AnyRef):Unit = print(x, NONE)
-
-  def println(x:AnyRef):Unit = println(x, NONE)
-
-  def print(b:Boolean):Unit = print(b, NONE)
-
-  def println(b:Boolean):Unit = println(b, NONE)
+  final def setLevel(level: Level):Level = {
+    val oldLevel = currentLevel
+    currentLevel = level
+    oldLevel
+  }
 
 }

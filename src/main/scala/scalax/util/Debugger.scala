@@ -36,7 +36,16 @@ class DebuggerWriter(out:java.io.OutputStream) extends java.io.PrintWriter(out, 
 
   protected var currentLevel = NONE
 
-  def print(s:String, level: Level):Unit = {
+  def print[T](s:T, level:Level):Unit = {
+    if (level <= currentLevel) print(if (s == null) "null"  else s.toString())
+  }
+
+  def println[T](s:T, level:Level):Unit = {
+    print(s, level)
+    println(level)
+  }
+
+  /*def print(s:String, level: Level):Unit = {
       if (level <= currentLevel) print(s)
   }
 
@@ -67,7 +76,7 @@ class DebuggerWriter(out:java.io.OutputStream) extends java.io.PrintWriter(out, 
       print(b, level)
       println(level)
     }
-  }
+  }*/
 
   def println(level: Level):Unit = {
       if (level <= currentLevel) println()

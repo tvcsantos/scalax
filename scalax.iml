@@ -20,11 +20,12 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.10.4:jar" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="file://$MODULE_DIR$/lib" />
+          <root url="jar://$MODULE_DIR$/lib/scallop_2.10-0.9.5.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/scallop_2.10-0.9.5.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/scallop_2.10-0.9.5.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -32,6 +33,7 @@
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.10.4:jar" level="project" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-reflect:2.10.4:jar" level="project" />
   </component>
 </module>
