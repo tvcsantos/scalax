@@ -14,6 +14,7 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
   
   import scalax.sys.SystemUtils
   import scalax.util.Level._
+  import java.util.Calendar
 
   type Parser = T
   type U
@@ -35,6 +36,11 @@ abstract class PLangCLI[T <: Parsers](override val args: Seq[String],
   
   def shortVersion(short:String) =
     shortVersionOpt = Some(short)
+
+  protected var dateOpt:Option[Calendar] = None
+
+  def date(d:Calendar) =
+    dateOpt = Some(d)
    
   //val debug = opt[Boolean]("debug", descr = "Debug mode")
 
@@ -125,6 +131,8 @@ import scala.collection.mutable.ListBuffer
 	      println(shortVersionOpt.getOrElse("unknown"))
 	      return;
 	    }
+
+      println(getVersionModel(shortVersionOpt, dateOpt))
 	      
 	    preStart()
 	        
