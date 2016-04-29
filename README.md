@@ -3,4 +3,4 @@ scalax
 
 Scala Extensions
 
-This repository as moved to https://bitbucket.org/tvcsantos/scalax
+This repository has moved to https://bitbucket.org/tvcsantos/scalax
