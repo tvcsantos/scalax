@@ -6,15 +6,15 @@ import org.rogach.scallop.ScallopConf
 
 import scala.util.parsing.combinator.Parsers
 import scalax.sys.SystemUtils.FileNameExtensionFilter
-import scalax.util.{DebuggerWriter, Debuggable}
+import scalax.util.Debuggable
 
 abstract class PLangCLI[T <: Parsers](override val args: Seq[String], 
     val filter:FileNameExtensionFilter) 
   	extends ScallopConf(args) with Debuggable {
   
   import scalax.sys.SystemUtils
-  import scalax.util.Level._
   import java.util.Calendar
+  import scalax.util.Level._
 
   type Parser = T
   type U
@@ -121,9 +121,9 @@ import scala.collection.mutable.ListBuffer
     setDebugger(outStream)
 
     if (debug.isSupplied) {
-      val level = scalax.util.Level.withName(debug())
+      val level = withName(debug())
       setLevel(level)
-    } else setLevel(scalax.util.Level.INFO)
+    } else setLevel(INFO)
       
     Console.withOut(outStream) {
       

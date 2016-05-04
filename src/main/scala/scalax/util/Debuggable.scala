@@ -2,7 +2,14 @@ package scalax.util
 
 import java.io.OutputStream
 
+object Level extends Enumeration {
+  type Level = Value
+  val ERROR, NONE, INFO, DEBUG = Value
+}
+
 trait Debuggable {
+
+  import Level._
 
   import java.io.PrintWriter
 
@@ -15,8 +22,6 @@ trait Debuggable {
   def setDebugger(debuggerOut: PrintWriter):Unit = {
     debuggerOpt = Some(debuggerOut)
   }
-
-  import scalax.util.Level._
 
   final def print[T](s:T):Unit = print(s, NONE)
 
@@ -40,8 +45,14 @@ trait Debuggable {
 
   final def setLevel(level: Level):Level = {
     val oldLevel = currentLevel
-    currentLevel = level
+    changeLevel(level)
     oldLevel
   }
+
+  def changeLevel(level:Level):Unit = {
+    currentLevel = level
+  }
+
+  final def getLevel = currentLevel
 
 }
